@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Web App</title>
+</head>
+<body>
+    <h1>Test Web App</h1>
+    <script>
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            if (tg.initDataUnsafe) {
+                alert(`Telegram ID: ${tg.initDataUnsafe.user.id}`);
+            } else {
+                alert("Ошибка initDataUnsafe");
+            }
+        } else {
+            alert("Эта страница работает только внутри Telegram");
+        }
+    </script>
+</body>
+</html>
