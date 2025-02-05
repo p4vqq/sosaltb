@@ -1,4 +1,4 @@
-let userId = null; // ID пользователя из TONKeeper
+let userId = null; // ID пользователя из Telegram
 let balance = 0;
 let energy = 100;
 let clickMultiplier = 1;
@@ -8,8 +8,8 @@ let clickPower = 3;
 
 // Функция для загрузки данных пользователя
 async function loadUserData() {
-    if (!userId) return alert("Сначала подключите свой кошелёк TONKeeper.");
-    const response = await fetch(`https://p4vqq.pythonanywhere.com/api/user/${userId}`);
+    if (!userId) return alert("Сначала авторизуйтесь через Telegram.");
+    const response = await fetch(`/api/user/${userId}`);
     if (!response.ok) return alert("Ошибка при загрузке данных пользователя.");
     const data = await response.json();
     balance = data.balance || 0;
@@ -23,7 +23,7 @@ async function loadUserData() {
 
 // Функция для сохранения данных пользователя
 async function saveUserData() {
-    if (!userId) return alert("Сначала подключите свой кошелёк TONKeeper.");
+    if (!userId) return alert("Сначала авторизуйтесь через Telegram.");
     const userData = {
         balance,
         energy,
@@ -32,35 +32,12 @@ async function saveUserData() {
         clickUpgradeCost,
         clickPower,
     };
-    const response = await fetch(`https://p4vqq.pythonanywhere.com/api/user/${userId}`, {
+    const response = await fetch(`/api/user/${userId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
     });
     if (!response.ok) alert("Ошибка при сохранении данных пользователя.");
-}
-
-// Подключение через TONKeeper
-function connectWallet() {
-    if (window.Tonkeeper) {
-        window.Tonkeeper.request({ method: "ton_connect" })
-            .then((result) => {
-                userId = result.account.address;
-                alert(`Вы успешно подключили кошелёк TONKeeper! Ваш адрес: ${userId}`);
-                loadUserData();
-            })
-            .catch((error) => alert("Ошибка подключения к TONKeeper."));
-    } else {
-        alert("TONKeeper не обнаружен. Установите расширение TONKeeper для браузера.");
-    }
-}
-
-// Обновление интерфейса
-function updateUI() {
-    document.getElementById("balance").textContent = Math.floor(balance);
-    document.getElementById("energy").textContent = energy;
-    document.getElementById("energy-upgrade-cost").textContent = energyUpgradeCost;
-    document.getElementById("click-upgrade-cost").textContent = clickUpgradeCost;
 }
 
 // Клик по монетке
@@ -72,36 +49,31 @@ function clickCoin() {
     updateUI();
 }
 
-// Улучшение энергии
-function upgradeEnergy() {
-    if (balance < energyUpgradeCost) return alert("Недостаточно DA для покупки!");
-    balance -= energyUpgradeCost;
-    energy += 100;
-    energyUpgradeCost *= 2;
-    saveUserData();
-    alert(`Вы купили улучшение энергии (+100). Новая стоимость: ${energyUpgradeCost} DA`);
-    updateUI();
+// Подключение через Telegram
+function connectTelegramWallet() {
+    if (window.Telegram) {
+        const tg = window.Telegram.WebApp;
+        userId = tg.initDataUnsafe.user.id; // Получаем ID пользователя
+        alert(`Вы успешно авторизовались через Telegram! Ваш ID: ${userId}`);
+        loadUserData(); // Загружаем данные пользователя после авторизации
+    } else {
+        alert("Эта функция доступна только внутри Telegram.");
+    }
 }
 
-// Улучшение клика
-function upgradeClick() {
-    if (balance < clickUpgradeCost) return alert("Недостаточно DA для покупки!");
-    balance -= clickUpgradeCost;
-    clickMultiplier *= clickPower;
-    clickUpgradeCost *= 2;
-    clickPower -= 0.5;
-    if (clickPower < 1.5) clickPower = 1.5;
-    saveUserData();
-    alert(`Вы улучшили клик x${clickMultiplier}. Новая стоимость: ${clickUpgradeCost} DA`);
-    updateUI();
+// Обновление интерфейса
+function updateUI() {
+    document.getElementById("balance").textContent = Math.floor(balance);
+    document.getElementById("energy").textContent = energy;
+    document.getElementById("energy-upgrade-cost").textContent = energyUpgradeCost;
+    document.getElementById("click-upgrade-cost").textContent = clickUpgradeCost;
 }
 
-// Восстановление энергии
-function restoreEnergy() {
-    energy = 100;
-    saveUserData();
-    updateUI();
+// Инициализация игры
+if (window.Telegram) {
+    const tg = window.Telegram.WebApp;
+    userId = tg.initDataUnsafe.user.id; // Автоматическая авторизация через Telegram
+    loadUserData();
+} else {
+    alert("Эта игра работает только внутри Telegram.");
 }
-
-// Загрузка данных при старте игры
-loadUserData();
