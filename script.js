@@ -24,14 +24,42 @@ async function loadUserData() {
         console.error("Ошибка при загрузке данных:", error);
         alert("Произошла ошибка. Попробуйте снова.");
     }
+}
 
 // Клик по монетке
 function clickCoin() {
     if (energy <= 0) return alert("У вас нет энергии!");
     balance += clickMultiplier;
     energy -= 1;
-    saveUserData();
+    saveUserData(); // Сохраняем данные после клика
     updateUI();
+}
+
+// Сохранение данных пользователя
+async function saveUserData() {
+    if (!userId) return alert("Сначала авторизуйтесь через Telegram.");
+    try {
+        const userData = {
+            balance,
+            energy,
+            clickMultiplier,
+            energyUpgradeCost,
+            clickUpgradeCost,
+            clickPower,
+        };
+        const response = await fetch(`https://p4vqq.pythonanywhere.com/api/user/${userId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData),
+        });
+        if (!response.ok) {
+            alert("Ошибка при сохранении данных пользователя.");
+            return;
+        }
+    } catch (error) {
+        console.error("Ошибка при сохранении данных:", error);
+        alert("Произошла ошибка. Попробуйте снова.");
+    }
 }
 
 // Подключение через Telegram
@@ -44,7 +72,7 @@ function connectTelegramWallet() {
         }
         userId = tg.initDataUnsafe.user.id; // Получаем ID пользователя
         alert(`Вы успешно авторизовались через Telegram! Ваш ID: ${userId}`);
-        loadUserData(); // Загружаем данные пользователя после авторизации
+        loadUserData(); // Загружаем данные пользователя
     } else {
         alert("Эта игра работает только внутри Telegram. Пожалуйста, откройте её через бота.");
     }
@@ -61,25 +89,6 @@ if (window.Telegram && window.Telegram.WebApp) {
     }
 } else {
     alert("Эта игра работает только внутри Telegram. Пожалуйста, откройте её через бота.");
-}
-
-// Сохранение данных пользователя
-async function saveUserData() {
-    if (!userId) return alert("Сначала авторизуйтесь через Telegram.");
-    const userData = {
-        balance,
-        energy,
-        clickMultiplier,
-        energyUpgradeCost,
-        clickUpgradeCost,
-        clickPower,
-    };
-    const response = await fetch(`/api/user/${userId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userData),
-    });
-    if (!response.ok) alert("Ошибка при сохранении данных пользователя.");
 }
 
 // Обновление интерфейса
