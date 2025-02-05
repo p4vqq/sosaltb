@@ -9,7 +9,7 @@ let clickPower = 3;
 // Функция для загрузки данных пользователя
 async function loadUserData() {
     if (!userId) return alert("Сначала подключите свой кошелёк TONKeeper.");
-    const response = await fetch(`/api/user/${userId}`);
+    const response = await fetch(`https://p4vqq.pythonanywhere.com/api/user/${userId}`);
     if (!response.ok) return alert("Ошибка при загрузке данных пользователя.");
     const data = await response.json();
     balance = data.balance || 0;
@@ -32,7 +32,7 @@ async function saveUserData() {
         clickUpgradeCost,
         clickPower,
     };
-    const response = await fetch(`/api/user/${userId}`, {
+    const response = await fetch(`https://p4vqq.pythonanywhere.com/api/user/${userId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
