@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sosal Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <h1>Sosal Clicker</h1>
+        <p>Нажимайте на монетку, пока не закончится энергия!</p>
+        <div id="coin" onclick="clickCoin()">💰 DA</div>
+        <p>Баланс: <span id="balance">0</span> DA</p>
+        <p>Энергия: <span id="energy">100</span></p>
+
+        <!-- Магазин -->
+        <h2>Магазин улучшений</h2>
+        <button onclick="upgradeEnergy()">Увеличить энергию (+100) - <span id="energy-upgrade-cost">200</span> DA</button>
+        <button onclick="upgradeClick()">Улучшить клик x<span id="click-multiplier">1</span> - <span id="click-upgrade-cost">200</span> DA</button>
+
+        <!-- Восстановление энергии -->
+        <button onclick="restoreEnergy()">Восстановить энергию</button>
+
+        <!-- Подключение кошелька -->
+        <button onclick="connectWallet()">Подключить кошелёк</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
